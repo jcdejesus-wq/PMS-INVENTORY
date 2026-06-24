@@ -49,6 +49,8 @@
         .btn-done:hover { background-color: #059669; }
         .btn-edit { background-color: #f1f5f9; color: #334155; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: 1px solid #cbd5e1; cursor: pointer; }
         .btn-delete { background-color: #fee2e2; color: #ef4444; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer; }
+        .btn-print { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; cursor: pointer; font-weight: 600; }
+        .btn-print:hover { background-color: #bae6fd; }
 
         /* MODAL POPUP */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
@@ -58,6 +60,11 @@
         .form-group label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.85rem; color: #334155; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.9rem; }
         .form-group small { color: #64748b; font-size: 0.75rem; display: block; margin-top: 2px; }
+
+        /* Checkbox Grid Layout */
+        .checkbox-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: #f8fafc; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; margin-top: 4px; }
+        .checkbox-item { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; font-weight: 600; color: #475569; }
+        .checkbox-item input { width: auto; cursor: pointer; }
 
         /* STRICT MAX 3 COLUMNS GRID */
         .fleet-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
@@ -79,31 +86,40 @@
         .badge-warning { background: #fef3c7; color: #92400e; }
         .badge-danger { background: #fee2e2; color: #991b1b; }
 
-        /* PROGRESS BAR STYLING */
-        .progress-section { margin-bottom: 8px; }
-        .progress-meta { display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; font-weight: 600; margin-bottom: 2px; }
-        .progress-container { background: #e2e8f0; border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 6px; }
-        .progress-bar { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
-        .bg-good { background-color: #10b981; }
-        .bg-warning { background-color: #f59e0b; }
-        .bg-danger { background-color: #ef4444; }
+        /* COLOR-CODED COMPACT PERCENTAGE SECTION */
+        .usage-percentages { display: flex; justify-content: space-between; padding: 6px 8px; border-radius: 6px; margin-bottom: 10px; border: 1px solid rgba(0,0,0,0.05); }
+        .percentage-item { font-size: 0.78rem; font-weight: 600; color: #334155; display: flex; gap: 4px; }
+        .percentage-value { font-weight: 700; }
 
-        .details-list { list-style: none; margin-bottom: 10px; }
-        .details-list li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+        /* Dynamic Percentage Box Background Statuses */
+        .box-safe { background-color: #e6f4ea; border-left: 3px solid #10b981; }
+        .box-warning { background-color: #fff7ed; border-left: 3px solid #f59e0b; }
+        .box-critical { background-color: #fef2f2; border-left: 3px solid #ef4444; }
+
+        .details-list { list-style: none; margin-bottom: 10px; margin-top: 5px; }
+        .details-list li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
         .label { color: #64748b; }
         .value { font-weight: 600; color: #334155; }
         
-        .trigger-reason { font-size: 0.75rem; font-style: italic; color: #64748b; margin-top: 3px; display: block; }
+        .trigger-reason { font-size: 0.75rem; font-style: italic; color: #64748b; margin-top: 8px; display: block; }
+        .countdown-text { font-size: 0.75rem; font-weight: 700; padding: 1px 5px; border-radius: 3px; display: inline-block; }
 
-        /* COMPACT HISTORY CONTAINER */
-        .history-section { background-color: #f8fafc; border-radius: 6px; padding: 8px; margin-top: 10px; border: 1px solid #e2e8f0; }
-        .history-title { font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 4px; display: block;}
-        .history-list { list-style: none; max-height: 85px; overflow-y: auto; }
-        .history-list li { font-size: 0.72rem; padding: 4px 0; border-bottom: 1px solid #e2e8f0; color: #334155; display: flex; flex-direction: column; }
+        /* SERVICE TAGS IN HISTORY */
+        .service-tags { display: flex; flex-wrap: wrap; gap: 3px; margin: 3px 0; }
+        .tag-item { background: #e2e8f0; color: #475569; font-size: 0.65rem; padding: 1px 4px; border-radius: 3px; font-weight: 600; text-transform: uppercase; }
+
+        /* COMPACT HISTORY CONTAINER WITH SOFT PASTEL ZEBRA-STRIPING */
+        .history-section { background-color: #f8fafc; border-radius: 6px; padding: 6px; margin-top: 10px; border: 1px solid #e2e8f0; }
+        .history-title { font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 5px; display: block; padding-left: 2px; }
+        .history-list { list-style: none; max-height: 95px; overflow-y: auto; border-radius: 4px; border: 1px solid #e2e8f0; }
+        .history-list li { font-size: 0.72rem; padding: 5px 6px; border-bottom: 1px solid #e2e8f0; color: #334155; display: flex; flex-direction: column; background-color: #ffffff; }
+        .history-list li:last-child { border-bottom: none; }
+        .history-list li:nth-child(even) { background-color: #f0f4f8; } 
+        
         .history-meta { display: flex; justify-content: space-between; font-weight: 600; }
-        .history-remarks { color: #64748b; font-style: italic; margin-top: 1px; }
+        .history-remarks { color: #64748b; font-style: italic; margin-top: 2px; padding-left: 8px; border-left: 2px solid #cbd5e1; }
 
-        .actions { display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 10px; margin-top: 12px; }
+        .actions { display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 10px; margin-top: 12px; align-items: center; }
         .right-actions { display: flex; gap: 4px; }
         
         .filter-indicator { font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 12px; display: none; }
@@ -219,7 +235,6 @@
                 <div class="form-group">
                     <label>New Target Odometer for NEXT PMS (KM):</label>
                     <input type="number" id="doneTargetKm" required>
-                    <small>💡 Automatically shifts to +10,000 KM for the next cycle.</small>
                 </div>
                 <div class="form-group">
                     <label>Date PMS was Performed:</label>
@@ -227,13 +242,24 @@
                 </div>
                 
                 <div class="form-group">
+                    <label>🔧 Services & Replacements Performed:</label>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item"><input type="checkbox" id="partOil" value="Oil Change"> Change Oil</label>
+                        <label class="checkbox-item"><input type="checkbox" id="partBrakes" value="Brakes"> Brake Pads/Fluid</label>
+                        <label class="checkbox-item"><input type="checkbox" id="partSpark" value="Spark Plugs"> Spark Plugs</label>
+                        <label class="checkbox-item"><input type="checkbox" id="partFilters" value="Filters"> Air/Fuel Filters</label>
+                        <label class="checkbox-item"><input type="checkbox" id="partAlignment" value="Alignment"> Tire Alignment</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label>Total PMS Service Cost (₱):</label>
                     <input type="number" id="doneCost" placeholder="e.g., 4500" min="0" required>
                 </div>
 
                 <div class="form-group">
                     <label>Service Remarks / Notes (Optional):</label>
-                    <textarea id="doneRemarks" rows="2" placeholder="e.g., Changed oil, replaced front brake pads"></textarea>
+                    <textarea id="doneRemarks" rows="2" placeholder="e.g., Mechanic found minor leak but fixed already"></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-submit" style="background-color: #10b981;">Update & Save to History</button>
@@ -354,119 +380,6 @@
             applyFilterAndSearch();
         }
 
-        function importFromCSV(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                const rows = text.split('\n');
-                
-                if (rows.length <= 1) {
-                    alert("The uploaded file is empty or missing data.");
-                    return;
-                }
-
-                let importedCount = 0;
-                let duplicateCount = 0;
-
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i].trim();
-                    if (!row) continue;
-
-                    const columns = row.split(',');
-                    if (columns.length < 8) continue; 
-
-                    const name = columns[0].trim();
-                    const plate = columns[1].trim();
-                    const currentKm = parseInt(columns[2]) || 0;
-                    const targetKm = parseInt(columns[3]) || 0;
-                    const lastPmsDate = columns[5].trim();
-                    const accumulatedCost = parseFloat(columns[8]) || 0;
-
-                    const isDuplicate = equipments.some(eq => (eq.plate || "").toLowerCase() === plate.toLowerCase());
-                    if (isDuplicate) {
-                        duplicateCount++;
-                        continue;
-                    }
-
-                    let reconstructedHistory = [];
-                    if (accumulatedCost > 0) {
-                        reconstructedHistory.push({
-                            date: lastPmsDate,
-                            odo: currentKm - 10000 > 0 ? currentKm - 10000 : 0,
-                            cost: accumulatedCost,
-                            remarks: "Imported backup baseline log."
-                        });
-                    }
-
-                    equipments.push({
-                        name: name,
-                        plate: plate,
-                        currentKm: currentKm,
-                        targetKm: targetKm,
-                        lastPmsDate: lastPmsDate,
-                        intervalMonths: "6", 
-                        history: reconstructedHistory
-                    });
-                    importedCount++;
-                }
-
-                alert(`🎉 Import Complete!\n\nSuccessfully Added: ${importedCount} Vehicles\nSkipped Duplicates: ${duplicateCount}`);
-                saveAndRefresh();
-                document.getElementById('importFile').value = ""; 
-            };
-            reader.readAsText(file);
-        }
-
-        function exportToExcel() {
-            if (equipments.length === 0) {
-                alert("No data available to export.");
-                return;
-            }
-            const today = new Date();
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Equipment Name,Plate Number/ID,Current Odo (KM),Target Odo (KM),Remaining KM,Last PMS Date,Target Due Date,Status,Total Cost Saved (PHP)\n";
-
-            equipments.forEach(eq => {
-                const remKm = (eq.targetKm || 0) - (eq.currentKm || 0);
-                let formattedTargetDate = "N/A";
-                let remDays = 0;
-                let status = "GOOD";
-
-                if (eq.lastPmsDate) {
-                    const lastPms = new Date(eq.lastPmsDate);
-                    if (!isNaN(lastPms.getTime())) {
-                        const targetDate = new Date(lastPms.setMonth(lastPms.getMonth() + parseInt(eq.intervalMonths || 6)));
-                        formattedTargetDate = targetDate.toISOString().split('T')[0];
-                        remDays = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
-                    }
-                }
-
-                if (remKm <= 0 || remDays <= 0) status = "OVERDUE";
-                else if (remKm <= 500 || remDays <= 14) status = "DUE SOON";
-
-                let totalCost = 0;
-                if (eq.history) {
-                    eq.history.forEach(h => { totalCost += (h.cost || 0); });
-                }
-
-                const cleanName = (eq.name || "").replace(/,/g, " ");
-                const cleanPlate = (eq.plate || "").replace(/,/g, " ");
-
-                csvContent += `${cleanName},${cleanPlate},${eq.currentKm || 0},${eq.targetKm || 0},${remKm},${eq.lastPmsDate || ''},${formattedTargetDate},${status},${totalCost}\n`;
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Fleet_PMS_Report_${today.toISOString().split('T')[0]}.csv`);
-            document.body.appendChild(link); 
-            link.click();
-            document.body.removeChild(link);
-        }
-
         function renderDashboardCards(dataToRender) {
             const grid = document.getElementById('fleetGrid');
             if(!grid) return;
@@ -528,31 +441,42 @@
                         reasonText = "Odometer and Date are safe.";
                     }
 
+                    // ⏳ UPGRADE: AGEING COUNTDOWN TEXT
+                    let countdownHTML = '';
+                    if (remainingDays <= 0) {
+                        countdownHTML = `<span class="countdown-text" style="background:#fee2e2; color:#ef4444;">Overdue by ${Math.abs(remainingDays)} days!</span>`;
+                    } else if (remainingDays <= 14) {
+                        countdownHTML = `<span class="countdown-text" style="background:#fff7ed; color:#ea580c;">${remainingDays} days left</span>`;
+                    } else {
+                        countdownHTML = `<span class="countdown-text" style="background:#e6f4ea; color:#16a34a;">${remainingDays} days safe</span>`;
+                    }
+
+                    // 🚨 UPGRADE: COLOR-CODED BOXLOGIC
                     let odoProgressPercent = Math.min(100, Math.max(0, ((10000 - remainingKm) / 10000) * 100));
                     if (remainingKm <= 0) odoProgressPercent = 100;
+                    let odoBoxClass = odoProgressPercent >= 100 ? 'box-critical' : (odoProgressPercent >= 95 ? 'box-warning' : 'box-safe');
 
                     let daysElapsed = totalIntervalDays - remainingDays;
                     let timeProgressPercent = Math.min(100, Math.max(0, (daysElapsed / totalIntervalDays) * 100));
                     if (remainingDays <= 0) timeProgressPercent = 100;
-
-                    let odoColorClass = 'bg-good';
-                    if (remainingKm <= 0) odoColorClass = 'bg-danger';
-                    else if (remainingKm <= 500) odoColorClass = 'bg-warning';
-
-                    let timeColorClass = 'bg-good';
-                    if (remainingDays <= 0) timeColorClass = 'bg-danger';
-                    else if (remainingDays <= 14) timeColorClass = 'bg-warning';
+                    let timeBoxClass = timeProgressPercent >= 100 ? 'box-critical' : (timeProgressPercent >= 90 ? 'box-warning' : 'box-safe');
 
                     let totalAccumulatedCost = 0;
-                    let historyHTML = '';
+                    let historyRows = '';
                     
                     if(eq.history && eq.history.length > 0) {
-                        let historyRows = '';
                         let sortedHistory = [...eq.history].reverse();
-                        
                         sortedHistory.forEach(hist => {
                             const costValue = hist.cost ? parseFloat(hist.cost) : 0;
                             totalAccumulatedCost += costValue;
+
+                            // Render parts tags inside logs if available
+                            let tagsHTML = '';
+                            if(hist.parts && hist.parts.length > 0) {
+                                tagsHTML = `<div class="service-tags">`;
+                                hist.parts.forEach(pt => { tagsHTML += `<span class="tag-item">${pt}</span>`; });
+                                tagsHTML += `</div>`;
+                            }
 
                             historyRows += `
                                 <li>
@@ -560,10 +484,14 @@
                                         <span>✓ ${hist.date || 'N/A'} (@ ${parseInt(hist.odo || 0).toLocaleString()} KM)</span> 
                                         <span style="color: #059669; font-weight:700;">₱${costValue.toLocaleString()}</span>
                                     </div>
+                                    ${tagsHTML}
                                     <div class="history-remarks">${hist.remarks ? hist.remarks : 'No notes recorded.'}</div>
                                 </li>`;
                         });
+                    }
 
+                    let historyHTML = '';
+                    if (historyRows !== '') {
                         historyHTML = `
                             <div class="history-section">
                                 <span class="history-title">📜 Service History Logs:</span>
@@ -585,21 +513,18 @@
                                     <span class="badge ${badgeClass}">${statusText}</span>
                                 </div>
 
-                                <div class="progress-section">
-                                    <div class="progress-meta">
-                                        <span>Odometer Usage Progress</span>
-                                        <span>${Math.round(odoProgressPercent)}%</span>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px;">
+                                    <div class="usage-percentages ${odoBoxClass}" style="margin-bottom:0;">
+                                        <div class="percentage-item">
+                                            <span>Odo:</span>
+                                            <span class="percentage-value">${Math.round(odoProgressPercent)}%</span>
+                                        </div>
                                     </div>
-                                    <div class="progress-container">
-                                        <div class="progress-bar ${odoColorClass}" style="width: ${odoProgressPercent}%"></div>
-                                    </div>
-
-                                    <div class="progress-meta">
-                                        <span>Timeframe Usage Progress</span>
-                                        <span>${Math.round(timeProgressPercent)}%</span>
-                                    </div>
-                                    <div class="progress-container">
-                                        <div class="progress-bar ${timeColorClass}" style="width: ${timeProgressPercent}%"></div>
+                                    <div class="usage-percentages ${timeBoxClass}" style="margin-bottom:0;">
+                                        <div class="percentage-item">
+                                            <span>Time:</span>
+                                            <span class="percentage-value">${Math.round(timeProgressPercent)}%</span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -607,19 +532,20 @@
                                     <li><span class="label">Current Odo:</span> <span class="value">${parseInt(eq.currentKm || 0).toLocaleString()} KM</span></li>
                                     <li><span class="label">Target Odo:</span> <span class="value" style="color:#ef4444;">${parseInt(eq.targetKm || 0).toLocaleString()} KM</span></li>
                                     <li><span class="label">Last PMS Date:</span> <span class="value">${eq.lastPmsDate || 'N/A'}</span></li>
-                                    <li><span class="label">Target Due:</span> <span class="value" style="color:#ef4444;">${formattedTargetDate}</span></li>
+                                    <li><span class="label">Target Due:</span> <span class="value" style="color:#ef4444; display:flex; flex-direction:column; align-items:flex-end; gap:2px;"><span>${formattedTargetDate}</span> ${countdownHTML}</span></li>
                                     <li><span class="label">Total Unit Expenses:</span> <span class="value" style="color:#10b981; font-size:0.9rem;">₱${totalAccumulatedCost.toLocaleString()}</span></li>
                                 </ul>
-                            </div>
-                            <div>
+
                                 <span class="trigger-reason">🔍 <strong>Reason:</strong> ${reasonText}</span>
                                 ${historyHTML}
-                                <div class="actions">
-                                    <button class="btn-done" onclick="openDoneModal(${globalIndex})">✅ Done PMS</button>
-                                    <div class="right-actions">
-                                        <button class="btn-edit" onclick="editEquipment(${globalIndex})">✏️</button>
-                                        <button class="btn-delete" onclick="deleteEquipment(${globalIndex})">🗑️</button>
-                                    </div>
+                            </div>
+                            
+                            <div class="actions">
+                                <button class="btn-done" onclick="openDoneModal(${globalIndex})">✅ Done PMS</button>
+                                <div class="right-actions">
+                                    <button class="btn-print" onclick="printIndividualSlip(${globalIndex})">🖨️ Slip</button>
+                                    <button class="btn-edit" onclick="editEquipment(${globalIndex})">✏️</button>
+                                    <button class="btn-delete" onclick="deleteEquipment(${globalIndex})">🗑️</button>
                                 </div>
                             </div>
                         </div>
@@ -628,6 +554,155 @@
                     console.error("Error rendering dashboard cards layout:", err);
                 }
             });
+        }
+
+        function openDoneModal(index) {
+            document.getElementById('donePmsIndex').value = index;
+            document.getElementById('donePmsForm').reset();
+            
+            const targetKm = equipments[index].targetKm || 0;
+            document.getElementById('doneCurrentKm').value = targetKm; 
+            document.getElementById('doneTargetKm').value = parseInt(targetKm) + 10000; 
+            document.getElementById('doneNewDate').value = new Date().toISOString().split('T')[0]; 
+            
+            document.getElementById('donePmsModal').style.display = 'flex';
+        }
+
+        function closeDoneModal() {
+            document.getElementById('donePmsModal').style.display = 'none';
+        }
+
+        function submitDonePms(e) {
+            e.preventDefault();
+            const index = document.getElementById('donePmsIndex').value;
+            
+            if (!equipments[index].history) {
+                equipments[index].history = [];
+            }
+            
+            // Collect Selected Services Tags
+            let selectedParts = [];
+            if(document.getElementById('partOil').checked) selectedParts.push("Oil Change");
+            if(document.getElementById('partBrakes').checked) selectedParts.push("Brakes");
+            if(document.getElementById('partSpark').checked) selectedParts.push("Spark Plugs");
+            if(document.getElementById('partFilters').checked) selectedParts.push("Filters");
+            if(document.getElementById('partAlignment').checked) selectedParts.push("Alignment");
+
+            equipments[index].history.push({
+                date: equipments[index].lastPmsDate,
+                odo: equipments[index].currentKm,
+                cost: parseFloat(document.getElementById('doneCost').value) || 0,
+                remarks: document.getElementById('doneRemarks').value.trim(),
+                parts: selectedParts // Saved inside history
+            });
+
+            equipments[index].currentKm = parseInt(document.getElementById('doneCurrentKm').value) || 0;
+            equipments[index].targetKm = parseInt(document.getElementById('doneTargetKm').value) || 0;
+            equipments[index].lastPmsDate = document.getElementById('doneNewDate').value;
+
+            saveAndRefresh();
+            closeDoneModal();
+        }
+
+        // 🖨️ UPGRADE: PRINT SLIP GENERATOR
+        function printIndividualSlip(index) {
+            const eq = equipments[index];
+            let totalExpenses = 0;
+            let historyTableRows = '';
+
+            if (eq.history && eq.history.length > 0) {
+                eq.history.forEach((hist, idx) => {
+                    totalExpenses += (hist.cost || 0);
+                    let partsText = hist.parts && hist.parts.length > 0 ? hist.parts.join(', ') : 'General PMS';
+                    historyTableRows += `
+                        <tr>
+                            <td>${idx + 1}</td>
+                            <td>${hist.date || 'N/A'}</td>
+                            <td>${parseInt(hist.odo || 0).toLocaleString()} KM</td>
+                            <td><strong>${partsText}</strong><br><small style="color:#555;">${hist.remarks || ''}</small></td>
+                            <td style="text-align:right;">₱${parseFloat(hist.cost || 0).toLocaleString()}</td>
+                        </tr>`;
+                });
+            } else {
+                historyTableRows = `<tr><td colspan="5" style="text-align:center; color:#777; padding:15px;">No historical service operations found for this vehicle.</td></tr>`;
+            }
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>PMS Work Order Slip - ${eq.plate}</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; color: #333; }
+                        .header-print { text-align: center; border-bottom: 3px double #333; padding-bottom: 10px; margin-bottom: 20px; }
+                        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; font-size: 14px; }
+                        .info-box { border: 1px dashed #999; padding: 12px; background: #fafafa; border-radius: 4px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+                        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+                        th { background-color: #f4f4f4; }
+                        .total-section { text-align: right; margin-top: 20px; font-size: 16px; font-weight: bold; padding: 10px; background: #e6f4ea; }
+                        .footer-sig { margin-top: 60px; display: flex; justify-content: space-between; font-size: 13px; }
+                        .sig-line { border-top: 1px solid #333; width: 200px; text-align: center; padding-top: 5px; margin-top: 40px; }
+                        @media print { .no-print { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="no-print" style="margin-bottom:20px; text-align:right;">
+                        <button onclick="window.print();" style="padding:10px 20px; background:#1e293b; color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer;">🖨️ Execute Print / Save PDF</button>
+                    </div>
+                    <div class="header-print">
+                        <h2>FLEET MAINTENANCE SERVICE SLIP</h2>
+                        <p style="margin-top:5px; color:#555;">Automated System Work Order Record</p>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <strong>VEHICLE DESCRIPTION:</strong><br>
+                            Unit Name: ${eq.name || 'Unknown'}<br>
+                            Plate/ID Number: <strong>${eq.plate || 'N/A'}</strong><br>
+                            Current System Odometer: ${parseInt(eq.currentKm || 0).toLocaleString()} KM
+                        </div>
+                        <div class="info-box">
+                            <strong>NEXT PMS COMPLIANCE SCHEDULE:</strong><br>
+                            Target Mileage: <span style="color:red; font-weight:bold;">${parseInt(eq.targetKm || 0).toLocaleString()} KM</span><br>
+                            Target Date Limit: <span style="color:red; font-weight:bold;">${eq.lastPmsDate ? new Date(new Date(eq.lastPmsDate).setMonth(new Date(eq.lastPmsDate).getMonth() + parseInt(eq.intervalMonths || 6))).toISOString().split('T')[0] : 'N/A'}</span><br>
+                            Interval Cycle: Every ${eq.intervalMonths || 6} Months
+                        </div>
+                    </div>
+                    
+                    <h3>📋 HISTORICAL LOG SUMMARY & COMPLETED REPLACEMENTS</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width:5%;">#</th>
+                                <th style="width:15%;">Service Date</th>
+                                <th style="width:15%;">Odometer Log</th>
+                                <th style="width:45%;">Components / Remarks Saved</th>
+                                <th style="width:20%; text-align:right;">Cost (PHP)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${historyTableRows}
+                        </tbody>
+                    </table>
+
+                    <div class="total-section">
+                        Accumulated Asset Maintenance Investment: ₱${totalExpenses.toLocaleString()}
+                    </div>
+
+                    <div class="footer-sig">
+                        <div>
+                            <p>Prepared By / Dispatcher:</p>
+                            <div class="sig-line">System Operations Signature</div>
+                        </div>
+                        <div>
+                            <p>Noted By / Maintenance Mechanic:</p>
+                            <div class="sig-line">Authorized Signatory</div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
 
         function saveEquipment(e) {
@@ -669,45 +744,6 @@
             closeModal();
         }
 
-        function openDoneModal(index) {
-            document.getElementById('donePmsIndex').value = index;
-            document.getElementById('donePmsForm').reset();
-            
-            const targetKm = equipments[index].targetKm || 0;
-            document.getElementById('doneCurrentKm').value = targetKm; 
-            document.getElementById('doneTargetKm').value = parseInt(targetKm) + 10000; 
-            document.getElementById('doneNewDate').value = new Date().toISOString().split('T')[0]; 
-            
-            document.getElementById('donePmsModal').style.display = 'flex';
-        }
-
-        function closeDoneModal() {
-            document.getElementById('donePmsModal').style.display = 'none';
-        }
-
-        function submitDonePms(e) {
-            e.preventDefault();
-            const index = document.getElementById('donePmsIndex').value;
-            
-            if (!equipments[index].history) {
-                equipments[index].history = [];
-            }
-            
-            equipments[index].history.push({
-                date: equipments[index].lastPmsDate,
-                odo: equipments[index].currentKm,
-                cost: parseFloat(document.getElementById('doneCost').value) || 0,
-                remarks: document.getElementById('doneRemarks').value.trim()
-            });
-
-            equipments[index].currentKm = parseInt(document.getElementById('doneCurrentKm').value) || 0;
-            equipments[index].targetKm = parseInt(document.getElementById('doneTargetKm').value) || 0;
-            equipments[index].lastPmsDate = document.getElementById('doneNewDate').value;
-
-            saveAndRefresh();
-            closeDoneModal();
-        }
-
         function saveAndRefresh() {
             localStorage.setItem('pms_fleet_v9_ultimate', JSON.stringify(equipments));
             calculateCountersOnly();
@@ -742,6 +778,48 @@
         }
         function closeModal() {
             document.getElementById('equipmentModal').style.display = 'none';
+        }
+
+        function importFromCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n');
+                let importedCount = 0;
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i].trim();
+                    if (!row) continue;
+                    const columns = row.split(',');
+                    if (columns.length < 5) continue;
+                    equipments.push({
+                        name: columns[0].trim(),
+                        plate: columns[1].trim(),
+                        currentKm: parseInt(columns[2]) || 0,
+                        targetKm: parseInt(columns[3]) || 0,
+                        lastPmsDate: columns[4].trim(),
+                        intervalMonths: "6",
+                        history: []
+                    });
+                    importedCount++;
+                }
+                alert(`Imported ${importedCount} items.`);
+                saveAndRefresh();
+            };
+            reader.readAsText(file);
+        }
+
+        function exportToExcel() {
+            let csv = "Name,Plate,CurrentKm,TargetKm,LastPmsDate\n";
+            equipments.forEach(e => {
+                csv += `"${e.name}","${e.plate}",${e.currentKm},${e.targetKm},"${e.lastPmsDate}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Fleet_PMS_Export.csv';
+            link.click();
         }
     </script>
 </body>
