@@ -6,7 +6,7 @@
     <title>Fleet & Vehicle PMS Monitor</title>
     
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%220.9em%22 font-size=%2290%22>⚙️</text></svg>">
-    
+
     <style>
         /* --- CSS STYLES --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -224,7 +224,8 @@
     </div>
 
     <script>
-        let equipments = JSON.parse(localStorage.getItem('pms_equipments_v7')) || [];
+        // 🛠️ CHANGED KEY TO V8 FRESH TO AVOID OLD CORRUPTED LOCAL STORAGE DATA CONFLICTS
+        let equipments = JSON.parse(localStorage.getItem('pms_fleet_v8_fresh')) || [];
 
         window.onload = function() {
             renderDashboard(equipments);
@@ -251,18 +252,25 @@
             }
 
             const today = new Date();
-            
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += "Equipment Name,Plate Number/ID,Current Odo (KM),Target Odo (KM),Remaining KM,Last PMS Date,Target Due Date,Status,Total Cost Saved (PHP)\n";
 
             equipments.forEach(eq => {
-                const remKm = eq.targetKm - eq.currentKm;
-                const lastPms = new Date(eq.lastPmsDate);
-                const targetDate = new Date(lastPms.setMonth(lastPms.getMonth() + parseInt(eq.intervalMonths)));
-                const formattedTargetDate = targetDate.toISOString().split('T')[0];
-                const remDays = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
-
+                const remKm = (eq.targetKm || 0) - (eq.currentKm || 0);
+                
+                let formattedTargetDate = "N/A";
+                let remDays = 0;
                 let status = "GOOD";
+
+                if (eq.lastPmsDate) {
+                    const lastPms = new Date(eq.lastPmsDate);
+                    if (!isNaN(lastPms.getTime())) {
+                        const targetDate = new Date(lastPms.setMonth(lastPms.getMonth() + parseInt(eq.intervalMonths || 6)));
+                        formattedTargetDate = targetDate.toISOString().split('T')[0];
+                        remDays = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+                    }
+                }
+
                 if (remKm <= 0 || remDays <= 0) status = "OVERDUE";
                 else if (remKm <= 500 || remDays <= 14) status = "DUE SOON";
 
@@ -271,10 +279,10 @@
                     eq.history.forEach(h => { totalCost += (h.cost || 0); });
                 }
 
-                const cleanName = eq.name.replace(/,/g, " ");
-                const cleanPlate = eq.plate.replace(/,/g, " ");
+                const cleanName = (eq.name || "").replace(/,/g, " ");
+                const cleanPlate = (eq.plate || "").replace(/,/g, " ");
 
-                csvContent += `${cleanName},${cleanPlate},${eq.currentKm},${eq.targetKm},${remKm},${eq.lastPmsDate},${formattedTargetDate},${status},${totalCost}\n`;
+                csvContent += `${cleanName},${cleanPlate},${eq.currentKm || 0},${eq.targetKm || 0},${remKm},${eq.lastPmsDate || ''},${formattedTargetDate},${status},${totalCost}\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
@@ -282,13 +290,13 @@
             link.setAttribute("href", encodedUri);
             link.setAttribute("download", `Fleet_PMS_Report_${today.toISOString().split('T')[0]}.csv`);
             document.body.appendChild(link); 
-            
             link.click();
             document.body.removeChild(link);
         }
 
         function renderDashboard(dataToRender) {
             const grid = document.getElementById('fleetGrid');
+            if(!grid) return;
             grid.innerHTML = '';
 
             let totalCount = equipments.length;
@@ -298,11 +306,18 @@
 
             const today = new Date();
 
+            // Safety Loop 1 (Counters Calculation with Default Fallbacks)
             equipments.forEach(eq => {
-                const remKm = eq.targetKm - eq.currentKm;
-                const lastPms = new Date(eq.lastPmsDate);
-                const targetDate = new Date(lastPms.setMonth(lastPms.getMonth() + parseInt(eq.intervalMonths)));
-                const remDays = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+                const remKm = (eq.targetKm || 0) - (eq.currentKm || 0);
+                let remDays = 9999;
+                
+                if (eq.lastPmsDate) {
+                    const lastPms = new Date(eq.lastPmsDate);
+                    if (!isNaN(lastPms.getTime())) {
+                        const targetDate = new Date(lastPms.setMonth(lastPms.getMonth() + parseInt(eq.intervalMonths || 6)));
+                        remDays = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+                    }
+                }
 
                 if (remKm <= 0 || remDays <= 0) dangerCount++;
                 else if (remKm <= 500 || remDays <= 14) warningCount++;
@@ -314,60 +329,247 @@
             document.getElementById('countWarning').innerText = warningCount;
             document.getElementById('countDanger').innerText = dangerCount;
 
-            if(dataToRender.length === 0) {
+            if(!dataToRender || dataToRender.length === 0) {
                 grid.innerHTML = `<p style="color: #64748b; grid-column: 1/-1; text-align: center; padding: 30px; font-size: 0.9rem;">No equipment found.</p>`;
                 return;
             }
 
+            // Safety Loop 2 (UI Rendering with Crash-Proof Try-Catch and Fallbacks)
             dataToRender.forEach((eq, index) => {
-                const remainingKm = eq.targetKm - eq.currentKm;
-                let kmStatus = 'GOOD'; 
-                if (remainingKm <= 0) kmStatus = 'OVERDUE';
-                else if (remainingKm <= 500) kmStatus = 'WARNING';
+                try {
+                    const remainingKm = (eq.targetKm || 0) - (eq.currentKm || 0);
+                    let kmStatus = 'GOOD'; 
+                    if (remainingKm <= 0) kmStatus = 'OVERDUE';
+                    else if (remainingKm <= 500) kmStatus = 'WARNING';
 
-                const lastPms = new Date(eq.lastPmsDate);
-                const targetDate = new Date(lastPms.setMonth(lastPms.getMonth() + parseInt(eq.intervalMonths)));
-                const timeDiff = targetDate.getTime() - today.getTime();
-                const remainingDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-                
-                let dateStatus = 'GOOD';
-                if (remainingDays <= 0) dateStatus = 'OVERDUE';
-                else if (remainingDays <= 14) dateStatus = 'WARNING';
+                    let formattedTargetDate = "N/A";
+                    let remainingDays = 9999;
+                    let dateStatus = 'GOOD';
 
-                let finalStatus = 'card-good';
-                let badgeClass = 'badge-good';
-                let statusText = 'Good';
-                let reasonText = '';
+                    if (eq.lastPmsDate) {
+                        const lastPms = new Date(eq.lastPmsDate);
+                        if (!isNaN(lastPms.getTime())) {
+                            const targetDate = new Date(lastPms.setMonth(lastPms.getMonth() + parseInt(eq.intervalMonths || 6)));
+                            if (!isNaN(targetDate.getTime())) {
+                                formattedTargetDate = targetDate.toISOString().split('T')[0];
+                                const timeDiff = targetDate.getTime() - today.getTime();
+                                remainingDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                                
+                                if (remainingDays <= 0) dateStatus = 'OVERDUE';
+                                else if (remainingDays <= 14) dateStatus = 'WARNING';
+                            }
+                        }
+                    }
 
-                if (kmStatus === 'OVERDUE' || dateStatus === 'OVERDUE') {
-                    finalStatus = 'card-danger';
-                    badgeClass = 'badge-danger';
-                    statusText = '🚨 Overdue';
-                    reasonText = kmStatus === 'OVERDUE' ? `Odo over: ${Math.abs(remainingKm).toLocaleString()} KM` : `Date over: ${Math.abs(remainingDays)} days`;
-                } 
-                else if (kmStatus === 'WARNING' || dateStatus === 'WARNING') {
-                    finalStatus = 'card-warning';
-                    badgeClass = 'badge-warning';
-                    statusText = 'Due Soon';
-                    reasonText = kmStatus === 'WARNING' ? `Odo left: ${remainingKm.toLocaleString()} KM` : `Date left: ${remainingDays} days`;
-                } else {
-                    reasonText = "Odometer and Date are safe.";
-                }
+                    let finalStatus = 'card-good';
+                    let badgeClass = 'badge-good';
+                    let statusText = 'Good';
+                    let reasonText = '';
 
-                const formattedTargetDate = targetDate.toISOString().split('T')[0];
+                    if (kmStatus === 'OVERDUE' || dateStatus === 'OVERDUE') {
+                        finalStatus = 'card-danger';
+                        badgeClass = 'badge-danger';
+                        statusText = '🚨 Overdue';
+                        reasonText = kmStatus === 'OVERDUE' ? `Odo over: ${Math.abs(remainingKm).toLocaleString()} KM` : `Date over: ${Math.abs(remainingDays)} days`;
+                    } 
+                    else if (kmStatus === 'WARNING' || dateStatus === 'WARNING') {
+                        finalStatus = 'card-warning';
+                        badgeClass = 'badge-warning';
+                        statusText = 'Due Soon';
+                        reasonText = kmStatus === 'WARNING' ? `Odo left: ${remainingKm.toLocaleString()} KM` : `Date left: ${remainingDays} days`;
+                    } else {
+                        reasonText = "Odometer and Date are safe.";
+                    }
 
-                let totalAccumulatedCost = 0;
-                let historyHTML = '';
-                
-                if(eq.history && eq.history.length > 0) {
-                    let historyRows = '';
-                    let sortedHistory = [...eq.history].reverse();
+                    let totalAccumulatedCost = 0;
+                    let historyHTML = '';
                     
-                    sortedHistory.forEach(hist => {
-                        const costValue = hist.cost ? parseFloat(hist.cost) : 0;
-                        totalAccumulatedCost += costValue;
+                    if(eq.history && eq.history.length > 0) {
+                        let historyRows = '';
+                        let sortedHistory = [...eq.history].reverse();
+                        
+                        sortedHistory.forEach(hist => {
+                            const costValue = hist.cost ? parseFloat(hist.cost) : 0;
+                            totalAccumulatedCost += costValue;
 
-                        historyRows += `
-                            <li>
-                                <div class="history-meta">
-                                    <span>✓ ${hist.date}
+                            historyRows += `
+                                <li>
+                                    <div class="history-meta">
+                                        <span>✓ ${hist.date || 'N/A'} (@ ${parseInt(hist.odo || 0).toLocaleString()} KM)</span> 
+                                        <span style="color: #059669; font-weight:700;">₱${costValue.toLocaleString()}</span>
+                                    </div>
+                                    <div class="history-remarks">${hist.remarks ? hist.remarks : 'No notes recorded.'}</div>
+                                </li>`;
+                        });
+
+                        historyHTML = `
+                            <div class="history-section">
+                                <span class="history-title">📜 Service History Logs:</span>
+                                <ul class="history-list">
+                                    ${historyRows}
+                                </ul>
+                            </div>
+                        `;
+                    }
+
+                    grid.innerHTML += `
+                        <div class="vehicle-card ${finalStatus}">
+                            <div>
+                                <div class="vehicle-header">
+                                    <div>
+                                        <span class="equipment-name">${eq.name || 'Unknown'}</span>
+                                        <span class="plate-no">ID/Plate: ${eq.plate || 'N/A'}</span>
+                                    </div>
+                                    <span class="badge ${badgeClass}">${statusText}</span>
+                                </div>
+                                <ul class="details-list">
+                                    <li><span class="label">Current Odo:</span> <span class="value">${parseInt(eq.currentKm || 0).toLocaleString()} KM</span></li>
+                                    <li><span class="label">Target Odo:</span> <span class="value" style="color:#ef4444;">${parseInt(eq.targetKm || 0).toLocaleString()} KM</span></li>
+                                    <li><span class="label">Last PMS Date:</span> <span class="value">${eq.lastPmsDate || 'N/A'}</span></li>
+                                    <li><span class="label">Target Due:</span> <span class="value" style="color:#ef4444;">${formattedTargetDate}</span></li>
+                                    <li><span class="label">Total PMS Cost:</span> <span class="value" style="color:#10b981; font-size:0.9rem;">₱${totalAccumulatedCost.toLocaleString()}</span></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <span class="trigger-reason">🔍 <strong>Reason:</strong> ${reasonText}</span>
+                                ${historyHTML}
+                                <div class="actions">
+                                    <button class="btn-done" onclick="openDoneModal(${index})">✅ Done PMS</button>
+                                    <div class="right-actions">
+                                        <button class="btn-edit" onclick="editEquipment(${index})">✏️</button>
+                                        <button class="btn-delete" onclick="deleteEquipment(${index})">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } catch(err) {
+                    console.error("Error rendering card row:", err);
+                }
+            });
+        }
+
+        function saveEquipment(e) {
+            e.preventDefault();
+            const index = document.getElementById('editIndex').value;
+            const inputPlate = document.getElementById('eqPlate').value.trim();
+            
+            if (index === "") {
+                const isDuplicate = equipments.some(eq => (eq.plate || "").toLowerCase() === inputPlate.toLowerCase());
+                if (isDuplicate) {
+                    alert(`🚨 WARNING: Plate Number "${inputPlate}" already exists!`);
+                    return; 
+                }
+            } else {
+                const isDuplicate = equipments.some((eq, i) => i !== parseInt(index) && (eq.plate || "").toLowerCase() === inputPlate.toLowerCase());
+                if (isDuplicate) {
+                    alert(`🚨 WARNING: Another equipment already uses Plate Number "${inputPlate}"!`);
+                    return; 
+                }
+            }
+
+            const newEq = {
+                name: document.getElementById('eqName').value,
+                plate: inputPlate,
+                currentKm: parseInt(document.getElementById('eqCurrentKm').value) || 0,
+                targetKm: parseInt(document.getElementById('eqTargetKm').value) || 0,
+                lastPmsDate: document.getElementById('eqLastPmsDate').value,
+                intervalMonths: document.getElementById('eqIntervalMonths').value,
+                history: index !== "" ? (equipments[index].history || []) : [] 
+            };
+
+            if (index === "") {
+                equipments.push(newEq);
+            } else {
+                equipments[index] = newEq;
+            }
+
+            saveAndRefresh();
+            closeModal();
+        }
+
+        function openDoneModal(index) {
+            document.getElementById('donePmsIndex').value = index;
+            document.getElementById('donePmsForm').reset();
+            
+            const targetKm = equipments[index].targetKm || 0;
+            document.getElementById('doneCurrentKm').value = targetKm; 
+            document.getElementById('doneTargetKm').value = parseInt(targetKm) + 10000; 
+            document.getElementById('doneNewDate').value = new Date().toISOString().split('T')[0]; 
+            
+            document.getElementById('donePmsModal').style.display = 'flex';
+        }
+
+        function closeDoneModal() {
+            document.getElementById('donePmsModal').style.display = 'none';
+        }
+
+        function submitDonePms(e) {
+            e.preventDefault();
+            const index = document.getElementById('donePmsIndex').value;
+            
+            if (!equipments[index].history) {
+                equipments[index].history = [];
+            }
+            
+            equipments[index].history.push({
+                date: equipments[index].lastPmsDate,
+                odo: equipments[index].currentKm,
+                cost: parseFloat(document.getElementById('doneCost').value) || 0,
+                remarks: document.getElementById('doneRemarks').value.trim()
+            });
+
+            equipments[index].currentKm = parseInt(document.getElementById('doneCurrentKm').value) || 0;
+            equipments[index].targetKm = parseInt(document.getElementById('doneTargetKm').value) || 0;
+            equipments[index].lastPmsDate = document.getElementById('doneNewDate').value;
+
+            saveAndRefresh();
+            closeDoneModal();
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('pms_fleet_v8_fresh', JSON.stringify(equipments));
+            renderDashboard(equipments);
+        }
+
+        function editEquipment(index) {
+            document.getElementById('modalTitle').innerText = "Edit Equipment";
+            document.getElementById('editIndex').value = index;
+            document.getElementById('eqName').value = equipments[index].name || '';
+            document.getElementById('eqPlate').value = equipments[index].plate || '';
+            document.getElementById('eqCurrentKm').value = equipments[index].currentKm || 0;
+            document.getElementById('eqTargetKm').value = equipments[index].targetKm || 0;
+            document.getElementById('eqLastPmsDate').value = equipments[index].lastPmsDate || '';
+            document.getElementById('eqIntervalMonths').value = equipments[index].intervalMonths || 6;
+            
+            document.getElementById('equipmentModal').style.display = 'flex';
+        }
+
+        function deleteEquipment(index) {
+            if(confirm("Are you sure you want to delete this equipment? This will erase all past historical logs for this vehicle.")) {
+                equipments.splice(index, 1);
+                saveAndRefresh();
+            }
+        }
+
+        function filterEquipment() {
+            const searchText = document.getElementById('searchBar').value.toLowerCase();
+            const filtered = equipments.filter(eq => {
+                return (eq.name || "").toLowerCase().includes(searchText) || 
+                       (eq.plate || "").toLowerCase().includes(searchText);
+            });
+            renderDashboard(filtered);
+        }
+
+        function openModal() {
+            document.getElementById('modalTitle').innerText = "Add Equipment";
+            document.getElementById('editIndex').value = "";
+            document.getElementById('equipmentForm').reset();
+            document.getElementById('equipmentModal').style.display = 'flex';
+        }
+        function closeModal() {
+            document.getElementById('equipmentModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
