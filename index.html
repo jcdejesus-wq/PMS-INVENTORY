@@ -10,39 +10,42 @@
     <style>
         /* --- CSS STYLES --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; }
-        body { background-color: #f8fafc; padding: 20px; color: #0f172a; }
-        .container { max-width: 1150px; margin: 0 auto; }
+        body { background-color: #f1f5f9; padding: 20px; color: #0f172a; }
+        .container { max-width: 1200px; margin: 0 auto; }
         
-        header { margin-bottom: 25px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; text-align: center; }
-        h1 { color: #1e293b; font-size: 1.75rem; font-weight: 800; letter-spacing: -0.5px; }
+        header { margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; text-align: center; }
+        h1 { color: #1e293b; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
         header p { color: #64748b; font-size: 0.9rem; margin-top: 4px; }
 
-        /* FLEET SUMMARY COUNTERS */
+        /* INTERACTIVE DASHBOARD COUNTERS */
         .summary-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 25px; }
-        .summary-card { background: white; padding: 12px 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; }
-        .summary-card .count { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-top: 2px; }
-        .summary-card .title { font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-total { border-left: 4px solid #64748b; }
-        .stat-good { border-left: 4px solid #10b981; }
-        .stat-warning { border-left: 4px solid #f59e0b; }
-        .stat-danger { border-left: 4px solid #ef4444; }
+        .summary-card { background: white; padding: 14px 15px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; cursor: pointer; transition: all 0.2s ease; position: relative; }
+        .summary-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .summary-card.active { background-color: #f8fafc; box-shadow: inset 0 0 0 2px #1e293b; }
+        
+        .summary-card .count { font-size: 1.6rem; font-weight: 700; color: #1e293b; margin-top: 2px; }
+        .summary-card .title { font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-total { border-left: 5px solid #64748b; }
+        .stat-good { border-left: 5px solid #10b981; }
+        .stat-warning { border-left: 5px solid #f59e0b; }
+        .stat-danger { border-left: 5px solid #ef4444; }
 
         /* CONTROLS (Search & Buttons) */
         .controls-section { display: flex; gap: 10px; margin-bottom: 20px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
         .search-bar { flex: 1; min-width: 250px; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; background-color: white; }
-        .btn-group { display: flex; gap: 8px; }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
         
-        .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; }
-        .btn-add { background-color: #1e293b; color: white; white-space: nowrap; }
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-add { background-color: #1e293b; color: white; }
         .btn-add:hover { background-color: #0f172a; }
-        
-        .btn-excel { background-color: #10b981; color: white; white-space: nowrap; }
+        .btn-excel { background-color: #10b981; color: white; }
         .btn-excel:hover { background-color: #059669; }
-        
-        .btn-submit { background-color: #1e293b; color: white; width: 100%; margin-top: 15px; }
+        .btn-import { background-color: #0284c7; color: white; }
+        .btn-import:hover { background-color: #0369a1; }
+        .btn-submit { background-color: #1e293b; color: white; width: 100%; margin-top: 15px; justify-content: center; }
         
         /* Card Action Buttons */
-        .btn-done { background-color: #10b981; color: white; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-done { background-color: #10b981; color: white; padding: 6px 12px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; }
         .btn-done:hover { background-color: #059669; }
         .btn-edit { background-color: #f1f5f9; color: #334155; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: 1px solid #cbd5e1; cursor: pointer; }
         .btn-delete { background-color: #fee2e2; color: #ef4444; padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; border: none; cursor: pointer; }
@@ -59,16 +62,15 @@
         /* STRICT MAX 3 COLUMNS GRID */
         .fleet-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         @media (min-width: 650px) { .fleet-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 950px) { .fleet-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1000px) { .fleet-grid { grid-template-columns: repeat(3, 1fr); } }
         
         /* VEHICLE CARD */
-        .vehicle-card { background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; }
-        
+        .vehicle-card { background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .card-good { border-top: 4px solid #10b981; }
         .card-warning { border-top: 4px solid #f59e0b; }
         .card-danger { border-top: 4px solid #ef4444; }
 
-        .vehicle-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .vehicle-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .equipment-name { font-size: 1.05rem; font-weight: 700; color: #1e293b; line-height: 1.2; }
         .plate-no { font-size: 0.8rem; color: #64748b; display: block; margin-top: 2px; font-weight: 500; }
         
@@ -77,8 +79,17 @@
         .badge-warning { background: #fef3c7; color: #92400e; }
         .badge-danger { background: #fee2e2; color: #991b1b; }
 
+        /* PROGRESS BAR STYLING */
+        .progress-section { margin-bottom: 8px; }
+        .progress-meta { display: flex; justify-content: space-between; font-size: 0.72rem; color: #64748b; font-weight: 600; margin-bottom: 2px; }
+        .progress-container { background: #e2e8f0; border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 6px; }
+        .progress-bar { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+        .bg-good { background-color: #10b981; }
+        .bg-warning { background-color: #f59e0b; }
+        .bg-danger { background-color: #ef4444; }
+
         .details-list { list-style: none; margin-bottom: 10px; }
-        .details-list li { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+        .details-list li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
         .label { color: #64748b; }
         .value { font-weight: 600; color: #334155; }
         
@@ -94,6 +105,8 @@
 
         .actions { display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 10px; margin-top: 12px; }
         .right-actions { display: flex; gap: 4px; }
+        
+        .filter-indicator { font-size: 0.85rem; font-weight: 600; color: #475569; margin-bottom: 12px; display: none; }
     </style>
 </head>
 <body>
@@ -105,19 +118,19 @@
         </header>
 
         <div class="summary-dashboard">
-            <div class="summary-card stat-total">
+            <div class="summary-card stat-total active" id="cardFilterAll" onclick="setFilter('ALL')">
                 <div class="title">Total Fleet</div>
                 <div class="count" id="countTotal">0</div>
             </div>
-            <div class="summary-card stat-good">
+            <div class="summary-card stat-good" id="cardFilterGood" onclick="setFilter('GOOD')">
                 <div class="title">Good Status</div>
                 <div class="count" id="countGood">0</div>
             </div>
-            <div class="summary-card stat-warning">
+            <div class="summary-card stat-warning" id="cardFilterWarning" onclick="setFilter('WARNING')">
                 <div class="title">Due Soon</div>
                 <div class="count" id="countWarning">0</div>
             </div>
-            <div class="summary-card stat-danger">
+            <div class="summary-card stat-danger" id="cardFilterDanger" onclick="setFilter('DANGER')">
                 <div class="title">Overdue</div>
                 <div class="count" id="countDanger">0</div>
             </div>
@@ -126,10 +139,15 @@
         <div class="controls-section">
             <input type="text" id="searchBar" class="search-bar" placeholder="Search Equipment or Plate Number..." oninput="filterEquipment()">
             <div class="btn-group">
-                <button class="btn btn-excel" onclick="exportToExcel()">📥 Export Report</button>
+                <input type="file" id="importFile" accept=".csv" style="display:none;" onchange="importFromCSV(event)">
+                
+                <button class="btn btn-import" onclick="document.getElementById('importFile').click()">📥 Import Backup</button>
+                <button class="btn btn-excel" onclick="exportToExcel()">📤 Export Report</button>
                 <button class="btn btn-add" onclick="openModal()">➕ Add Equipment</button>
             </div>
         </div>
+
+        <div class="filter-indicator" id="filterIndicator">Showing: Overdue Only</div>
 
         <div class="fleet-grid" id="fleetGrid">
             </div>
@@ -224,11 +242,12 @@
     </div>
 
     <script>
-        // 🛠️ CHANGED KEY TO V8 FRESH TO AVOID OLD CORRUPTED LOCAL STORAGE DATA CONFLICTS
-        let equipments = JSON.parse(localStorage.getItem('pms_fleet_v8_fresh')) || [];
+        let equipments = JSON.parse(localStorage.getItem('pms_fleet_v9_ultimate')) || [];
+        let currentFilter = 'ALL'; 
 
         window.onload = function() {
-            renderDashboard(equipments);
+            calculateCountersOnly();
+            applyFilterAndSearch();
         };
 
         function autoCalcTargetOdo() {
@@ -245,19 +264,173 @@
             }
         }
 
+        function setFilter(filterType) {
+            currentFilter = filterType;
+            
+            document.getElementById('cardFilterAll').classList.remove('active');
+            document.getElementById('cardFilterGood').classList.remove('active');
+            document.getElementById('cardFilterWarning').classList.remove('active');
+            document.getElementById('cardFilterDanger').classList.remove('active');
+
+            const indicator = document.getElementById('filterIndicator');
+            if (filterType === 'ALL') {
+                document.getElementById('cardFilterAll').classList.add('active');
+                indicator.style.display = 'none';
+            } else {
+                indicator.style.display = 'block';
+                if (filterType === 'GOOD') {
+                    document.getElementById('cardFilterGood').classList.add('active');
+                    indicator.innerText = "Active Filter: Showing Safe / GOOD Status Units";
+                } else if (filterType === 'WARNING') {
+                    document.getElementById('cardFilterWarning').classList.add('active');
+                    indicator.innerText = "Active Filter: Showing DUE SOON Status Units";
+                } else if (filterType === 'DANGER') {
+                    document.getElementById('cardFilterDanger').classList.add('active');
+                    indicator.innerText = "Active Filter: Showing OVERDUE Units";
+                }
+            }
+            applyFilterAndSearch();
+        }
+
+        function calculateCountersOnly() {
+            let goodCount = 0;
+            let warningCount = 0;
+            let dangerCount = 0;
+            const today = new Date();
+
+            equipments.forEach(eq => {
+                const remKm = (eq.targetKm || 0) - (eq.currentKm || 0);
+                let remDays = 9999;
+                if (eq.lastPmsDate) {
+                    const lastPms = new Date(eq.lastPmsDate);
+                    if (!isNaN(lastPms.getTime())) {
+                        const targetDate = new Date(lastPms.setMonth(lastPms.getMonth() + parseInt(eq.intervalMonths || 6)));
+                        remDays = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+                    }
+                }
+
+                if (remKm <= 0 || remDays <= 0) dangerCount++;
+                else if (remKm <= 500 || remDays <= 14) warningCount++;
+                else goodCount++;
+            });
+
+            document.getElementById('countTotal').innerText = equipments.length;
+            document.getElementById('countGood').innerText = goodCount;
+            document.getElementById('countWarning').innerText = warningCount;
+            document.getElementById('countDanger').innerText = dangerCount;
+        }
+
+        function applyFilterAndSearch() {
+            const searchText = document.getElementById('searchBar').value.toLowerCase();
+            const today = new Date();
+
+            const filteredData = equipments.filter(eq => {
+                const matchesSearch = (eq.name || "").toLowerCase().includes(searchText) || (eq.plate || "").toLowerCase().includes(searchText);
+                if (!matchesSearch) return false;
+
+                if (currentFilter === 'ALL') return true;
+
+                const remKm = (eq.targetKm || 0) - (eq.currentKm || 0);
+                let remDays = 9999;
+                if (eq.lastPmsDate) {
+                    const lastPms = new Date(eq.lastPmsDate);
+                    if (!isNaN(lastPms.getTime())) {
+                        const targetDate = new Date(lastPms.setMonth(lastPms.getMonth() + parseInt(eq.intervalMonths || 6)));
+                        remDays = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+                    }
+                }
+
+                let status = 'GOOD';
+                if (remKm <= 0 || remDays <= 0) status = 'DANGER';
+                else if (remKm <= 500 || remDays <= 14) status = 'WARNING';
+
+                return status === currentFilter;
+            });
+
+            renderDashboardCards(filteredData);
+        }
+
+        function filterEquipment() {
+            applyFilterAndSearch();
+        }
+
+        function importFromCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n');
+                
+                if (rows.length <= 1) {
+                    alert("The uploaded file is empty or missing data.");
+                    return;
+                }
+
+                let importedCount = 0;
+                let duplicateCount = 0;
+
+                for (let i = 1; i < rows.length; i++) {
+                    const row = rows[i].trim();
+                    if (!row) continue;
+
+                    const columns = row.split(',');
+                    if (columns.length < 8) continue; 
+
+                    const name = columns[0].trim();
+                    const plate = columns[1].trim();
+                    const currentKm = parseInt(columns[2]) || 0;
+                    const targetKm = parseInt(columns[3]) || 0;
+                    const lastPmsDate = columns[5].trim();
+                    const accumulatedCost = parseFloat(columns[8]) || 0;
+
+                    const isDuplicate = equipments.some(eq => (eq.plate || "").toLowerCase() === plate.toLowerCase());
+                    if (isDuplicate) {
+                        duplicateCount++;
+                        continue;
+                    }
+
+                    let reconstructedHistory = [];
+                    if (accumulatedCost > 0) {
+                        reconstructedHistory.push({
+                            date: lastPmsDate,
+                            odo: currentKm - 10000 > 0 ? currentKm - 10000 : 0,
+                            cost: accumulatedCost,
+                            remarks: "Imported backup baseline log."
+                        });
+                    }
+
+                    equipments.push({
+                        name: name,
+                        plate: plate,
+                        currentKm: currentKm,
+                        targetKm: targetKm,
+                        lastPmsDate: lastPmsDate,
+                        intervalMonths: "6", 
+                        history: reconstructedHistory
+                    });
+                    importedCount++;
+                }
+
+                alert(`🎉 Import Complete!\n\nSuccessfully Added: ${importedCount} Vehicles\nSkipped Duplicates: ${duplicateCount}`);
+                saveAndRefresh();
+                document.getElementById('importFile').value = ""; 
+            };
+            reader.readAsText(file);
+        }
+
         function exportToExcel() {
             if (equipments.length === 0) {
                 alert("No data available to export.");
                 return;
             }
-
             const today = new Date();
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += "Equipment Name,Plate Number/ID,Current Odo (KM),Target Odo (KM),Remaining KM,Last PMS Date,Target Due Date,Status,Total Cost Saved (PHP)\n";
 
             equipments.forEach(eq => {
                 const remKm = (eq.targetKm || 0) - (eq.currentKm || 0);
-                
                 let formattedTargetDate = "N/A";
                 let remDays = 0;
                 let status = "GOOD";
@@ -294,49 +467,22 @@
             document.body.removeChild(link);
         }
 
-        function renderDashboard(dataToRender) {
+        function renderDashboardCards(dataToRender) {
             const grid = document.getElementById('fleetGrid');
             if(!grid) return;
             grid.innerHTML = '';
 
-            let totalCount = equipments.length;
-            let goodCount = 0;
-            let warningCount = 0;
-            let dangerCount = 0;
-
             const today = new Date();
 
-            // Safety Loop 1 (Counters Calculation with Default Fallbacks)
-            equipments.forEach(eq => {
-                const remKm = (eq.targetKm || 0) - (eq.currentKm || 0);
-                let remDays = 9999;
-                
-                if (eq.lastPmsDate) {
-                    const lastPms = new Date(eq.lastPmsDate);
-                    if (!isNaN(lastPms.getTime())) {
-                        const targetDate = new Date(lastPms.setMonth(lastPms.getMonth() + parseInt(eq.intervalMonths || 6)));
-                        remDays = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
-                    }
-                }
-
-                if (remKm <= 0 || remDays <= 0) dangerCount++;
-                else if (remKm <= 500 || remDays <= 14) warningCount++;
-                else goodCount++;
-            });
-
-            document.getElementById('countTotal').innerText = totalCount;
-            document.getElementById('countGood').innerText = goodCount;
-            document.getElementById('countWarning').innerText = warningCount;
-            document.getElementById('countDanger').innerText = dangerCount;
-
             if(!dataToRender || dataToRender.length === 0) {
-                grid.innerHTML = `<p style="color: #64748b; grid-column: 1/-1; text-align: center; padding: 30px; font-size: 0.9rem;">No equipment found.</p>`;
+                grid.innerHTML = `<p style="color: #64748b; grid-column: 1/-1; text-align: center; padding: 40px; font-size: 0.95rem; font-weight:500;">No vehicle matching the selected filter rules found.</p>`;
                 return;
             }
 
-            // Safety Loop 2 (UI Rendering with Crash-Proof Try-Catch and Fallbacks)
             dataToRender.forEach((eq, index) => {
                 try {
+                    const globalIndex = equipments.findIndex(item => item.plate === eq.plate);
+
                     const remainingKm = (eq.targetKm || 0) - (eq.currentKm || 0);
                     let kmStatus = 'GOOD'; 
                     if (remainingKm <= 0) kmStatus = 'OVERDUE';
@@ -345,6 +491,7 @@
                     let formattedTargetDate = "N/A";
                     let remainingDays = 9999;
                     let dateStatus = 'GOOD';
+                    let totalIntervalDays = parseInt(eq.intervalMonths || 6) * 30;
 
                     if (eq.lastPmsDate) {
                         const lastPms = new Date(eq.lastPmsDate);
@@ -380,6 +527,21 @@
                     } else {
                         reasonText = "Odometer and Date are safe.";
                     }
+
+                    let odoProgressPercent = Math.min(100, Math.max(0, ((10000 - remainingKm) / 10000) * 100));
+                    if (remainingKm <= 0) odoProgressPercent = 100;
+
+                    let daysElapsed = totalIntervalDays - remainingDays;
+                    let timeProgressPercent = Math.min(100, Math.max(0, (daysElapsed / totalIntervalDays) * 100));
+                    if (remainingDays <= 0) timeProgressPercent = 100;
+
+                    let odoColorClass = 'bg-good';
+                    if (remainingKm <= 0) odoColorClass = 'bg-danger';
+                    else if (remainingKm <= 500) odoColorClass = 'bg-warning';
+
+                    let timeColorClass = 'bg-good';
+                    if (remainingDays <= 0) timeColorClass = 'bg-danger';
+                    else if (remainingDays <= 14) timeColorClass = 'bg-warning';
 
                     let totalAccumulatedCost = 0;
                     let historyHTML = '';
@@ -422,29 +584,48 @@
                                     </div>
                                     <span class="badge ${badgeClass}">${statusText}</span>
                                 </div>
+
+                                <div class="progress-section">
+                                    <div class="progress-meta">
+                                        <span>Odometer Usage Progress</span>
+                                        <span>${Math.round(odoProgressPercent)}%</span>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar ${odoColorClass}" style="width: ${odoProgressPercent}%"></div>
+                                    </div>
+
+                                    <div class="progress-meta">
+                                        <span>Timeframe Usage Progress</span>
+                                        <span>${Math.round(timeProgressPercent)}%</span>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar ${timeColorClass}" style="width: ${timeProgressPercent}%"></div>
+                                    </div>
+                                </div>
+
                                 <ul class="details-list">
                                     <li><span class="label">Current Odo:</span> <span class="value">${parseInt(eq.currentKm || 0).toLocaleString()} KM</span></li>
                                     <li><span class="label">Target Odo:</span> <span class="value" style="color:#ef4444;">${parseInt(eq.targetKm || 0).toLocaleString()} KM</span></li>
                                     <li><span class="label">Last PMS Date:</span> <span class="value">${eq.lastPmsDate || 'N/A'}</span></li>
                                     <li><span class="label">Target Due:</span> <span class="value" style="color:#ef4444;">${formattedTargetDate}</span></li>
-                                    <li><span class="label">Total PMS Cost:</span> <span class="value" style="color:#10b981; font-size:0.9rem;">₱${totalAccumulatedCost.toLocaleString()}</span></li>
+                                    <li><span class="label">Total Unit Expenses:</span> <span class="value" style="color:#10b981; font-size:0.9rem;">₱${totalAccumulatedCost.toLocaleString()}</span></li>
                                 </ul>
                             </div>
                             <div>
                                 <span class="trigger-reason">🔍 <strong>Reason:</strong> ${reasonText}</span>
                                 ${historyHTML}
                                 <div class="actions">
-                                    <button class="btn-done" onclick="openDoneModal(${index})">✅ Done PMS</button>
+                                    <button class="btn-done" onclick="openDoneModal(${globalIndex})">✅ Done PMS</button>
                                     <div class="right-actions">
-                                        <button class="btn-edit" onclick="editEquipment(${index})">✏️</button>
-                                        <button class="btn-delete" onclick="deleteEquipment(${index})">🗑️</button>
+                                        <button class="btn-edit" onclick="editEquipment(${globalIndex})">✏️</button>
+                                        <button class="btn-delete" onclick="deleteEquipment(${globalIndex})">🗑️</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     `;
                 } catch(err) {
-                    console.error("Error rendering card row:", err);
+                    console.error("Error rendering dashboard cards layout:", err);
                 }
             });
         }
@@ -528,8 +709,9 @@
         }
 
         function saveAndRefresh() {
-            localStorage.setItem('pms_fleet_v8_fresh', JSON.stringify(equipments));
-            renderDashboard(equipments);
+            localStorage.setItem('pms_fleet_v9_ultimate', JSON.stringify(equipments));
+            calculateCountersOnly();
+            applyFilterAndSearch();
         }
 
         function editEquipment(index) {
@@ -550,15 +732,6 @@
                 equipments.splice(index, 1);
                 saveAndRefresh();
             }
-        }
-
-        function filterEquipment() {
-            const searchText = document.getElementById('searchBar').value.toLowerCase();
-            const filtered = equipments.filter(eq => {
-                return (eq.name || "").toLowerCase().includes(searchText) || 
-                       (eq.plate || "").toLowerCase().includes(searchText);
-            });
-            renderDashboard(filtered);
         }
 
         function openModal() {
