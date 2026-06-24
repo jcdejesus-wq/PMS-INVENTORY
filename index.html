@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fleet & Vehicle PMS Monitor</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%220.9em%22 font-size=%2290%22>⚙️</text></svg>">
+    
     <style>
         /* --- CSS STYLES --- */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -33,7 +36,6 @@
         .btn-add { background-color: #1e293b; color: white; white-space: nowrap; }
         .btn-add:hover { background-color: #0f172a; }
         
-        /* 🛠️ NEW: EXCEL EXPORT BUTTON COLOR */
         .btn-excel { background-color: #10b981; color: white; white-space: nowrap; }
         .btn-excel:hover { background-color: #059669; }
         
@@ -242,7 +244,6 @@
             }
         }
 
-        // 🛠️ NEW: EXPORT FUNCTION (GENERATES COMMA-SEPARATED EXCEL REPORT)
         function exportToExcel() {
             if (equipments.length === 0) {
                 alert("No data available to export.");
@@ -251,11 +252,9 @@
 
             const today = new Date();
             
-            // Excel Headers
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += "Equipment Name,Plate Number/ID,Current Odo (KM),Target Odo (KM),Remaining KM,Last PMS Date,Target Due Date,Status,Total Cost Saved (PHP)\n";
 
-            // Loop and calculate live data for every vehicle row
             equipments.forEach(eq => {
                 const remKm = eq.targetKm - eq.currentKm;
                 const lastPms = new Date(eq.lastPmsDate);
@@ -267,28 +266,24 @@
                 if (remKm <= 0 || remDays <= 0) status = "OVERDUE";
                 else if (remKm <= 500 || remDays <= 14) status = "DUE SOON";
 
-                // Accumulate historical costs
                 let totalCost = 0;
                 if (eq.history) {
                     eq.history.forEach(h => { totalCost += (h.cost || 0); });
                 }
 
-                // Clean text tags to avoid CSV broken column bugs
                 const cleanName = eq.name.replace(/,/g, " ");
                 const cleanPlate = eq.plate.replace(/,/g, " ");
 
-                // Append Row Data
                 csvContent += `${cleanName},${cleanPlate},${eq.currentKm},${eq.targetKm},${remKm},${eq.lastPmsDate},${formattedTargetDate},${status},${totalCost}\n`;
             });
 
-            // Create invisible trigger download element
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
             link.setAttribute("download", `Fleet_PMS_Report_${today.toISOString().split('T')[0]}.csv`);
             document.body.appendChild(link); 
             
-            link.click(); // Trigger file download
+            link.click();
             document.body.removeChild(link);
         }
 
@@ -375,179 +370,4 @@
                         historyRows += `
                             <li>
                                 <div class="history-meta">
-                                    <span>✓ ${hist.date} (@ ${parseInt(hist.odo).toLocaleString()} KM)</span> 
-                                    <span style="color: #059669; font-weight:700;">₱${costValue.toLocaleString()}</span>
-                                </div>
-                                <div class="history-remarks">${hist.remarks ? hist.remarks : 'No notes recorded.'}</div>
-                            </li>`;
-                    });
-
-                    historyHTML = `
-                        <div class="history-section">
-                            <span class="history-title">📜 Service History Logs:</span>
-                            <ul class="history-list">
-                                ${historyRows}
-                            </ul>
-                        </div>
-                    `;
-                }
-
-                grid.innerHTML += `
-                    <div class="vehicle-card ${finalStatus}">
-                        <div>
-                            <div class="vehicle-header">
-                                <div>
-                                    <span class="equipment-name">${eq.name}</span>
-                                    <span class="plate-no">ID/Plate: ${eq.plate}</span>
-                                </div>
-                                <span class="badge ${badgeClass}">${statusText}</span>
-                            </div>
-                            <ul class="details-list">
-                                <li><span class="label">Current Odo:</span> <span class="value">${parseInt(eq.currentKm).toLocaleString()} KM</span></li>
-                                <li><span class="label">Target Odo:</span> <span class="value" style="color:#ef4444;">${parseInt(eq.targetKm).toLocaleString()} KM</span></li>
-                                <li><span class="label">Last PMS Date:</span> <span class="value">${eq.lastPmsDate}</span></li>
-                                <li><span class="label">Target Due:</span> <span class="value" style="color:#ef4444;">${formattedTargetDate}</span></li>
-                                <li><span class="label">Total PMS Cost:</span> <span class="value" style="color:#10b981; font-size:0.9rem;">₱${totalAccumulatedCost.toLocaleString()}</span></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <span class="trigger-reason">🔍 <strong>Reason:</strong> ${reasonText}</span>
-                            
-                            ${historyHTML}
-
-                            <div class="actions">
-                                <button class="btn-done" onclick="openDoneModal(${index})">✅ Done PMS</button>
-                                <div class="right-actions">
-                                    <button class="btn-edit" onclick="editEquipment(${index})">✏️</button>
-                                    <button class="btn-delete" onclick="deleteEquipment(${index})">🗑️</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        function saveEquipment(e) {
-            e.preventDefault();
-            const index = document.getElementById('editIndex').value;
-            const inputPlate = document.getElementById('eqPlate').value.trim();
-            
-            if (index === "") {
-                const isDuplicate = equipments.some(eq => eq.plate.toLowerCase() === inputPlate.toLowerCase());
-                if (isDuplicate) {
-                    alert(`🚨 WARNING: Plate Number "${inputPlate}" already exists! \n\nPlease locate the existing card to log 'Done PMS' or update its details instead.`);
-                    return; 
-                }
-            } else {
-                const isDuplicate = equipments.some((eq, i) => i !== parseInt(index) && eq.plate.toLowerCase() === inputPlate.toLowerCase());
-                if (isDuplicate) {
-                    alert(`🚨 WARNING: Another equipment already uses Plate Number "${inputPlate}"!`);
-                    return; 
-                }
-            }
-
-            const newEq = {
-                name: document.getElementById('eqName').value,
-                plate: inputPlate,
-                currentKm: parseInt(document.getElementById('eqCurrentKm').value),
-                targetKm: parseInt(document.getElementById('eqTargetKm').value),
-                lastPmsDate: document.getElementById('eqLastPmsDate').value,
-                intervalMonths: document.getElementById('eqIntervalMonths').value,
-                history: index !== "" ? (equipments[index].history || []) : [] 
-            };
-
-            if (index === "") {
-                equipments.push(newEq);
-            } else {
-                equipments[index] = newEq;
-            }
-
-            saveAndRefresh();
-            closeModal();
-        }
-
-        function openDoneModal(index) {
-            document.getElementById('donePmsIndex').value = index;
-            document.getElementById('donePmsForm').reset();
-            
-            document.getElementById('doneCurrentKm').value = equipments[index].targetKm; 
-            document.getElementById('doneTargetKm').value = parseInt(equipments[index].targetKm) + 10000; 
-            document.getElementById('doneNewDate').value = new Date().toISOString().split('T')[0]; 
-            
-            document.getElementById('donePmsModal').style.display = 'flex';
-        }
-
-        function closeDoneModal() {
-            document.getElementById('donePmsModal').style.display = 'none';
-        }
-
-        function submitDonePms(e) {
-            e.preventDefault();
-            const index = document.getElementById('donePmsIndex').value;
-            
-            if (!equipments[index].history) {
-                equipments[index].history = [];
-            }
-            
-            equipments[index].history.push({
-                date: equipments[index].lastPmsDate,
-                odo: equipments[index].currentKm,
-                cost: parseFloat(document.getElementById('doneCost').value) || 0,
-                remarks: document.getElementById('doneRemarks').value.trim()
-            });
-
-            equipments[index].currentKm = parseInt(document.getElementById('doneCurrentKm').value);
-            equipments[index].targetKm = parseInt(document.getElementById('doneTargetKm').value);
-            equipments[index].lastPmsDate = document.getElementById('doneNewDate').value;
-
-            saveAndRefresh();
-            closeDoneModal();
-        }
-
-        function saveAndRefresh() {
-            localStorage.setItem('pms_equipments_v7', JSON.stringify(equipments));
-            renderDashboard(equipments);
-        }
-
-        function editEquipment(index) {
-            document.getElementById('modalTitle').innerText = "Edit Equipment";
-            document.getElementById('editIndex').value = index;
-            document.getElementById('eqName').value = equipments[index].name;
-            document.getElementById('eqPlate').value = equipments[index].plate;
-            document.getElementById('eqCurrentKm').value = equipments[index].currentKm;
-            document.getElementById('eqTargetKm').value = equipments[index].targetKm;
-            document.getElementById('eqLastPmsDate').value = equipments[index].lastPmsDate;
-            document.getElementById('eqIntervalMonths').value = equipments[index].intervalMonths;
-            
-            document.getElementById('equipmentModal').style.display = 'flex';
-        }
-
-        function deleteEquipment(index) {
-            if(confirm("Are you sure you want to delete this equipment? This will erase all past historical logs for this vehicle.")) {
-                equipments.splice(index, 1);
-                saveAndRefresh();
-            }
-        }
-
-        function filterEquipment() {
-            const searchText = document.getElementById('searchBar').value.toLowerCase();
-            const filtered = equipments.filter(eq => {
-                return eq.name.toLowerCase().includes(searchText) || 
-                       eq.plate.toLowerCase().includes(searchText);
-            });
-            renderDashboard(filtered);
-        }
-
-        function openModal() {
-            document.getElementById('modalTitle').innerText = "Add Equipment";
-            document.getElementById('editIndex').value = "";
-            document.getElementById('equipmentForm').reset();
-            document.getElementById('equipmentModal').style.display = 'flex';
-        }
-        function closeModal() {
-            document.getElementById('equipmentModal').style.display = 'none';
-        }
-    </script>
-</body>
-</html>
+                                    <span>✓ ${hist.date}
